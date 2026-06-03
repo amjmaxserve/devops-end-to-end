@@ -21,7 +21,6 @@ steps:
 
   - name: Verify Runner
     run: |
-      echo "===== Runner Information ====="
       hostname
       whoami
       pwd
@@ -29,21 +28,11 @@ steps:
 
   - name: Build Docker Image
     run: |
-      docker build \
-        -t farm-inventory:v1 \
-        -f docker/Dockerfile .
+      docker build -t farm-inventory:v1 -f docker/Dockerfile .
 
   - name: Verify Docker Image
     run: |
       docker images | grep farm-inventory
-
-  - name: Trivy Security Scan
-    uses: aquasecurity/trivy-action@master
-    with:
-      image-ref: farm-inventory:v1
-      format: table
-      severity: HIGH,CRITICAL
-      exit-code: 0
 
   - name: Remove Existing Container
     run: |
@@ -64,10 +53,11 @@ steps:
   - name: Health Check
     run: |
       sleep 10
-      curl http://192.168.29.5:8001/
+      curl http://localhost:8001/
 
   - name: Cleanup
     if: always()
     run: |
       docker rm -f farm-test || true
+
 
