@@ -55,12 +55,12 @@ pipeline {
             }
         }
 
-        stage('Cleanup') {
-            steps {
-                sh '''
-                docker rm -f farm-test || true
-                '''
-            }
-        }
+        // stage('Cleanup') {
+        //     steps {
+        //         sh '''
+        //         docker rm -f farm-test || true
+        //         '''
+        //     }
+        // }
     }
 }
