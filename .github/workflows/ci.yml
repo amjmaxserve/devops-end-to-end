@@ -1,63 +1,62 @@
+
 name: Farm Inventory CI
 
 on:
-push:
-branches:
-- main
-- feature/inventory-api
-
-pull_request:
-branches:
-- main
+  push:
+    branches:
+      - main
+      - feature/inventory-api
+  pull_request:
+    branches:
+      - main
 
 jobs:
-build-and-test:
-runs-on: self-hosted
+  build-and-test:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
 
+      - name: Verify Runner
+        run: |
+          hostname
+          whoami
+          pwd
+          docker --version
 
-steps:
-  - name: Checkout Source Code
-    uses: actions/checkout@v4
+      - name: Build Docker Image
+        run: |
+          docker build -t farm-inventory:v1 -f docker/Dockerfile .
 
-  - name: Verify Runner
-    run: |
-      hostname
-      whoami
-      pwd
-      docker --version
+      - name: Verify Docker Image
+        run: |
+          docker images | grep farm-inventory
 
-  - name: Build Docker Image
-    run: |
-      docker build -t farm-inventory:v1 -f docker/Dockerfile .
+      - name: Remove Existing Container
+        run: |
+          docker rm -f farm-test || true
 
-  - name: Verify Docker Image
-    run: |
-      docker images | grep farm-inventory
+      - name: Run Application Container
+        run: |
+          docker run -d \
+            --name farm-test \
+            -p 8001:8000 \
+            farm-inventory:v1
 
-  - name: Remove Existing Container
-    run: |
-      docker rm -f farm-test || true
+      - name: Container Debug
+        run: |
+          docker ps -a
+          docker logs farm-test || true
 
-  - name: Run Application Container
-    run: |
-      docker run -d \
-        --name farm-test \
-        -p 8001:8000 \
-        farm-inventory:v1
+      - name: Health Check
+        run: |
+          sleep 10
+          curl http://localhost:8001/
 
-  - name: Container Debug
-    run: |
-      docker ps -a
-      docker logs farm-test || true
+      - name: Cleanup
+        if: always()
+        run: |
+          docker rm -f farm-test || true
 
-  - name: Health Check
-    run: |
-      sleep 10
-      curl http://localhost:8001/
-
-  - name: Cleanup
-    if: always()
-    run: |
-      docker rm -f farm-test || true
 
 
