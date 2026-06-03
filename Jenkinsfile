@@ -26,7 +26,16 @@ pipeline {
             }
         }
 
-        stage('Health Check') {
+        stage('Container Debug') {
+            steps {
+                sh '''
+                docker ps -a
+                docker logs farm-test || true
+                '''
+            }
+        }
+        
+	    stage('Health Check') {
             steps {
                 sh '''
                 sleep 10
