@@ -13,6 +13,17 @@ pipeline {
             }
         }
 
+        stage('Trivy Security Scan') {
+            steps {
+                sh '''
+                trivy image \
+                --severity HIGH,CRITICAL \
+                --format table \
+                farm-inventory:v1
+                '''
+            }
+        }
+        
         stage('Run Container') {
             steps {
                 sh '''
