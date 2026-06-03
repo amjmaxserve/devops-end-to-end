@@ -16,14 +16,13 @@ pipeline {
         stage('Trivy Security Scan') {
             steps {
                 sh '''
-                trivy image \
-                --severity HIGH,CRITICAL \
-                --format table \
-                farm-inventory:v1
+                docker run --rm \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                aquasec/trivy image farm-inventory:v1
                 '''
             }
         }
-        
+
         stage('Run Container') {
             steps {
                 sh '''
