@@ -40,7 +40,7 @@ pipeline {
                 sh '''
                 sleep 10
 
-                curl http://localhost:8001/
+                curl http://192.168.29.5:8001/
                 '''
             }
         }
