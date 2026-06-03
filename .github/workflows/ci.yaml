@@ -11,21 +11,21 @@ branches:
 - main
 
 jobs:
+build-and-test:
+runs-on: self-hosted
 
-build:
-
-
-runs-on: ubuntu-latest
-
+```
 steps:
-
-  - name: Checkout Source
+  - name: Checkout Source Code
     uses: actions/checkout@v4
 
-  - name: Set up Python
-    uses: actions/setup-python@v5
-    with:
-      python-version: "3.12"
+  - name: Verify Runner
+    run: |
+      echo "===== Runner Information ====="
+      hostname
+      whoami
+      pwd
+      docker --version
 
   - name: Build Docker Image
     run: |
@@ -33,19 +33,33 @@ steps:
         -t farm-inventory:v1 \
         -f docker/Dockerfile .
 
-  - name: Trivy Scan
+  - name: Verify Docker Image
+    run: |
+      docker images | grep farm-inventory
+
+  - name: Trivy Security Scan
     uses: aquasecurity/trivy-action@master
     with:
       image-ref: farm-inventory:v1
       format: table
       severity: HIGH,CRITICAL
+      exit-code: 0
 
-  - name: Run Container
+  - name: Remove Existing Container
+    run: |
+      docker rm -f farm-test || true
+
+  - name: Run Application Container
     run: |
       docker run -d \
         --name farm-test \
         -p 8001:8000 \
         farm-inventory:v1
+
+  - name: Container Debug
+    run: |
+      docker ps -a
+      docker logs farm-test || true
 
   - name: Health Check
     run: |
@@ -56,4 +70,4 @@ steps:
     if: always()
     run: |
       docker rm -f farm-test || true
-
+```
