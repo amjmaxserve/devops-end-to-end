@@ -3,9 +3,12 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Debug') {
             steps {
-                echo 'Source Code Available'
+                sh '''
+                pwd
+                ls -la
+                '''
             }
         }
 
@@ -13,8 +16,8 @@ pipeline {
             steps {
                 sh '''
                 docker build \
-                -t farm-inventory:v1 \
-                -f Dockerfiles/Dockerfile .
+                  -t farm-inventory:v1 \
+                  -f docker/Dockerfile .
                 '''
             }
         }
