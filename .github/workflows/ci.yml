@@ -17,6 +17,12 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
+      - name: Login to docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
       - name: Verify Runner
         run: |
           hostname
@@ -26,30 +32,40 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t farm-inventory:v1 -f docker/Dockerfile .
+          docker build -t arjunmj/farm-inventory:latest \
+          -t arjunmj/farm-inventory:${{ github.run_number}} \
+          -f docker/Dockerfile .
 
       - name: Verify Docker Image
         run: |
-          docker images | grep farm-inventory
+          docker images | grep arjunmj/farm-inventory
       
       - name: trivy Scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: farm-inventory:v1
+          image-ref: arjunmj/farm-inventory:latest
           format: 'table'
           serverity: 'HIGH,CRITICAL'
           exit-code: '0'
+      
+      
 
       - name: Remove Existing Container
         run: |
           docker rm -f farm-test || true
-
+      
+      - name: push to docker hub
+        run: |
+          docker push arjunmj/farm-inventory:latest
+          docker push arjunmj/farm-inventory:${{ github.run_number}}
+      
+          
       - name: Run Application Container
         run: |
           docker run -d \
             --name farm-test \
             -p 8001:8000 \
-            farm-inventory:v1
+            arjunmj/farm-inventory:latest
 
       - name: Container Debug
         run: |
