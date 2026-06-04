@@ -74,7 +74,11 @@ jobs:
           kubectl set image deployment/farm-inventory \
           farm-inventory=arjunmj/farm-inventory:${{ github.run_number }} \
           -n farm
-      
+      - name: Annotate Deployments
+        run: |
+          kubectl annotate deployments farm-inventory \
+          kubernetes.io/change-cause="GitHub run ${{github.run_number}}" \
+          -n farm --overwrite
       - name: Wait for rollout
         run: |
           kubectl rollout status deployment/farm-inventory -n farm
