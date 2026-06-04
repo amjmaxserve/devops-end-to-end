@@ -65,10 +65,14 @@ jobs:
         run: |
           kubectl get nodes
       
+      - name: Show Image Tag
+        run: |
+           echo "Deploying image arjunmj/farm-inventory:${{ github.run_number }}"
+      
       - name: Update Deployment Image
         run: |
           kubectl set image deployment/farm-inventory \
-          farm-inventory=arjunmj/farm-inventory:{{ github.run_number }} \
+          farm-inventory=arjunmj/farm-inventory:${{ github.run_number }} \
           -n farm
       
       - name: Wait for rollout
