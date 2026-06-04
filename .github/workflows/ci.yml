@@ -53,45 +53,51 @@ jobs:
         run: |
           docker push arjunmj/farm-inventory:latest
           docker push arjunmj/farm-inventory:${{ github.run_number }}
-
-
-  deploy-test:
+  
+  deploy-k8s:
     runs-on: self-hosted
     needs: push-image
+
+    env:
+        KUBECONFIG: /home/devops/.kube/config
     steps:
-      - name: Remove Existing Container
+      - name: Verify Kubernetes
         run: |
-          docker rm -f farm-test || true
-
-      - name: Run Container
+          kubectl get nodes
+      
+      - name: Update Deployment Image
         run: |
-          docker run -d \
-          --name farm-test \
-          -p 8001:8000 \
-          arjunmj/farm-inventory:latest
-
-      - name: Container Debug
+          kubectl set image deployment/farm-inventory \
+          farm-inventory=arjunmj/farm-inventory:{{ github.run_number }} \
+          -n farm
+      
+      - name: Wait for rollout
         run: |
-          docker ps -a
-          docker logs farm-test || true
-
-
-  health-check:
+          kubectl rollout status deployment/farm-inventory -n farm
+  
+  verify-deployment:
     runs-on: self-hosted
-    needs: deploy-test
+    needs: deploy-k8s
+
+    env:
+        KUBECONFIG: /home/devops/.kube/config
     steps:
-      - name: Verify Application
+      - name: verify pods 
         run: |
-          sleep 10
-          curl http://192.168.29.5:8001/
-
-
-  cleanup:
-    runs-on: self-hosted
-    needs: health-check
-    if: always()
-    steps:
-      - name: Cleanup Container
+          kubectl get pods -n farm
+      - name: Verify Deployments
         run: |
-          docker rm -f farm-test || true
-
+          kubectl get deployment -n farm
+      - name: Verify Services
+        run: |
+          kubectl get svc -n farm
+      - name: Verify Ingress
+        run: |
+          kubectl get ingress -n farm
+      - name: Application Health Check
+        run: |
+          curl -H "Host: farm-inventory.local" \
+          http://192.168.29.5/
+      
+      
+    
