@@ -10,7 +10,7 @@ from app.database import engine
 from app.models.inventory_model import Base
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.service.health_servce import check_database
+from app.services.health_servce import check_database
 
 
 Base.metadata.create_all(bind=engine)
