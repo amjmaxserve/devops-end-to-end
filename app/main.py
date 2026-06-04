@@ -1,6 +1,7 @@
 from fastapi import (
     FastAPI,
     Response,
+    Depends,
     status
     )
 
