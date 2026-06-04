@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: farm-inventory-ingress
+  namespace: farm
+
+spec:
+  ingressClassName: traefik
+
+  rules:
+    - host: farm-inventory.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: farm-inventory-service
+                port:
+                  number: 8000

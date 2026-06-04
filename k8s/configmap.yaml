@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: farm-inventory-config
+  namespace: farm
+data:
+  APP_NAME: "Farm Inventory"
+  ENVIRONMENT: "Development"
+  COMPANY: "Amjmax Solutions"
+  

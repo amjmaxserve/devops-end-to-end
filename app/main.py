@@ -14,3 +14,7 @@ def home():
     return {
         "message": "Farm Inventory API"
     }
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
