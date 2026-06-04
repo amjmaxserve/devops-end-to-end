@@ -4,7 +4,12 @@ metadata:
   name: farm-inventory-config
   namespace: farm
 data:
+
   APP_NAME: "Farm Inventory"
   ENVIRONMENT: "Development"
   COMPANY: "Amjmax Solutions"
+
+  DB_HOST: postgres-service.database.svc.cluster.local
+  DB_PORT: "5432"
+  DB_NAME: farmdb
   
