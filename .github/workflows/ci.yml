@@ -16,6 +16,11 @@ jobs:
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
+      
+      - name: Debug secrets
+        run: |
+          echo "DOCKERHUB_USERNAME exists: ${{ secrets.DOCKERHUB_USERNAME != '' }}"
+          echo "DOCKER_TOKEN exists: ${{ secrets.DOCKER_TOKEN != '' }}"
 
       - name: Login to docker Hub
         uses: docker/login-action@v3
@@ -59,7 +64,7 @@ jobs:
           docker push arjunmj/farm-inventory:latest
           docker push arjunmj/farm-inventory:${{ github.run_number}}
       
-          
+
       - name: Run Application Container
         run: |
           docker run -d \
