@@ -1,8 +1,5 @@
-from fastapi import (
-    APIRouter, 
-    HTTPException, 
-    Depends
-)
+from fastapi import APIRouter
+from fastapi import Depends
 
 from sqlalchemy.orm import Session
 
@@ -15,8 +12,7 @@ from app.schemas.inventory_schema import (
     InventoryResponse
 )
 
-
-
+from app.exceptions import InventoryNotFoundException
 
 router = APIRouter()
 
@@ -57,12 +53,10 @@ def get_inventory_by_id(
     )
 
     if not item:
-        raise HTTPException(
-            status_code=404,
-            detail="Inventory item not found"
-        )
+        raise InventoryNotFoundException(inventory_id)
 
     return item
+
 
 @router.put("/{inventory_id}", response_model=InventoryResponse)
 def update_inventory(
@@ -77,10 +71,7 @@ def update_inventory(
     )
 
     if not item:
-        raise HTTPException(
-            status_code=404,
-            detail="Inventory item not found"
-        )
+        raise InventoryNotFoundException(inventory_id)
 
     item.name = inventory_update.name
     item.quantity = inventory_update.quantity
@@ -89,6 +80,7 @@ def update_inventory(
     db.refresh(item)
 
     return item
+
 
 @router.delete("/{inventory_id}")
 def delete_inventory(
@@ -102,10 +94,7 @@ def delete_inventory(
     )
 
     if not item:
-        raise HTTPException(
-            status_code=404,
-            detail="Inventory item not found"
-        )
+        raise InventoryNotFoundException(inventory_id)
 
     db.delete(item)
     db.commit()

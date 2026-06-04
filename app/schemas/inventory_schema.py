@@ -1,14 +1,26 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class InventoryCreate(BaseModel):
-    name: str
-    quantity: int
+    name: str = Field(
+        min_length=2,
+        max_length=100
+    )
+
+    quantity: int = Field(
+        gt=0
+    )
 
 
 class InventoryUpdate(BaseModel):
-    name: str
-    quantity: int
+    name: str = Field(
+        min_length=2,
+        max_length=100
+    )
+
+    quantity: int = Field(
+        gt=0
+    )
 
 
 class InventoryResponse(BaseModel):
