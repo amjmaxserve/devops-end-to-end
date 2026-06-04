@@ -6,6 +6,11 @@ class InventoryCreate(BaseModel):
     quantity: int
 
 
+class InventoryUpdate(BaseModel):
+    name: str
+    quantity: int
+
+
 class InventoryResponse(BaseModel):
     id: int
     name: str

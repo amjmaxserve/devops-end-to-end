@@ -1,5 +1,8 @@
-from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import (
+    APIRouter, 
+    HTTPException, 
+    Depends
+)
 
 from sqlalchemy.orm import Session
 
@@ -8,8 +11,12 @@ from app.models.inventory_model import Inventory
 
 from app.schemas.inventory_schema import (
     InventoryCreate,
+    InventoryUpdate,
     InventoryResponse
 )
+
+
+
 
 router = APIRouter()
 
@@ -36,3 +43,73 @@ def get_inventory(
     db: Session = Depends(get_db)
 ):
     return db.query(Inventory).all()
+
+
+@router.get("/{inventory_id}", response_model=InventoryResponse)
+def get_inventory_by_id(
+    inventory_id: int,
+    db: Session = Depends(get_db)
+):
+    item = (
+        db.query(Inventory)
+        .filter(Inventory.id == inventory_id)
+        .first()
+    )
+
+    if not item:
+        raise HTTPException(
+            status_code=404,
+            detail="Inventory item not found"
+        )
+
+    return item
+
+@router.put("/{inventory_id}", response_model=InventoryResponse)
+def update_inventory(
+    inventory_id: int,
+    inventory_update: InventoryUpdate,
+    db: Session = Depends(get_db)
+):
+    item = (
+        db.query(Inventory)
+        .filter(Inventory.id == inventory_id)
+        .first()
+    )
+
+    if not item:
+        raise HTTPException(
+            status_code=404,
+            detail="Inventory item not found"
+        )
+
+    item.name = inventory_update.name
+    item.quantity = inventory_update.quantity
+
+    db.commit()
+    db.refresh(item)
+
+    return item
+
+@router.delete("/{inventory_id}")
+def delete_inventory(
+    inventory_id: int,
+    db: Session = Depends(get_db)
+):
+    item = (
+        db.query(Inventory)
+        .filter(Inventory.id == inventory_id)
+        .first()
+    )
+
+    if not item:
+        raise HTTPException(
+            status_code=404,
+            detail="Inventory item not found"
+        )
+
+    db.delete(item)
+    db.commit()
+
+    return {
+        "message": "Inventory deleted successfully"
+    }
