@@ -106,6 +106,51 @@ jobs:
         run: |
           curl -H "Host: farm-inventory.local" \
           http://192.168.29.5/
+  
+  cleanup-dockerhub:
+    needs: push-image
+    runs-on: self-hosted
+
+    steps:
+    - name: Install jq
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq
+
+    - name: Cleanup old Docker Hub tags
+      env:
+        DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+        DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        REPOSITORY: farm-inventory
+      run: |
+
+        TOKEN=$(curl -s \
+          -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"username\":\"$DOCKER_USER\",\"password\":\"$DOCKER_TOKEN\"}" \
+          https://hub.docker.com/v2/users/login/ \
+          | jq -r .token)
+
+        TAGS=$(curl -s \
+          -H "Authorization: JWT $TOKEN" \
+          "https://hub.docker.com/v2/repositories/$DOCKER_USER/$REPOSITORY/tags/?page_size=100" \
+          | jq -r '.results[].name')
+
+        OLD_TAGS=$(echo "$TAGS" \
+          | grep -E '^[0-9]+$' \
+          | sort -n \
+          | head -n -15)
+
+        for tag in $OLD_TAGS
+        do
+          echo "Deleting tag: $tag"
+
+          curl -s -X DELETE \
+            -H "Authorization: JWT $TOKEN" \
+            "https://hub.docker.com/v2/repositories/$DOCKER_USER/$REPOSITORY/tags/$tag/"
+        done            
+
+
       
       
     
