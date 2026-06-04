@@ -1,4 +1,3 @@
-
 name: Farm Inventory CI
 
 on:
@@ -6,86 +5,93 @@ on:
     branches:
       - main
       - feature/inventory-api
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build-and-test:
+  
+  build:
     runs-on: self-hosted
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
-      
-      - name: Debug secrets
-        run: |
-          echo "DOCKERHUB_USERNAME exists: ${{ secrets.DOCKERHUB_USERNAME != '' }}"
-          echo "DOCKERHUB_TOKEN exists: ${{ secrets.DOCKERHUB_TOKEN != '' }}"
 
-      - name: Login to docker Hub
+      - name: Build Docker Image
+        run: |
+          docker build \
+          -t arjunmj/farm-inventory:latest \
+          -t arjunmj/farm-inventory:${{ github.run_number }} \
+          -f docker/Dockerfile .
+
+      - name: Verify Docker Image
+        run: |
+          docker images | grep farm-inventory
+
+
+  security-scan:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Trivy Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: arjunmj/farm-inventory:latest
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+
+  push-image:
+    runs-on: self-hosted
+    needs: security-scan
+    steps:
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Verify Runner
+      - name: Push Images
         run: |
-          hostname
-          whoami
-          pwd
-          docker --version
+          docker push arjunmj/farm-inventory:latest
+          docker push arjunmj/farm-inventory:${{ github.run_number }}
 
-      - name: Build Docker Image
-        run: |
-          docker build -t arjunmj/farm-inventory:latest \
-          -t arjunmj/farm-inventory:${{ github.run_number}} \
-          -f docker/Dockerfile .
 
-      - name: Verify Docker Image
-        run: |
-          docker images | grep arjunmj/farm-inventory
-      
-      - name: trivy Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: arjunmj/farm-inventory:latest
-          format: 'table'
-          serverity: 'HIGH,CRITICAL'
-          exit-code: '0'
-      
-      
-
+  deploy-test:
+    runs-on: self-hosted
+    needs: push-image
+    steps:
       - name: Remove Existing Container
         run: |
           docker rm -f farm-test || true
-      
-      - name: push to docker hub
-        run: |
-          docker push arjunmj/farm-inventory:latest
-          docker push arjunmj/farm-inventory:${{ github.run_number}}
-      
 
-      - name: Run Application Container
+      - name: Run Container
         run: |
           docker run -d \
-            --name farm-test \
-            -p 8001:8000 \
-            arjunmj/farm-inventory:latest
+          --name farm-test \
+          -p 8001:8000 \
+          arjunmj/farm-inventory:latest
 
       - name: Container Debug
         run: |
           docker ps -a
           docker logs farm-test || true
 
-      - name: Health Check
+
+  health-check:
+    runs-on: self-hosted
+    needs: deploy-test
+    steps:
+      - name: Verify Application
         run: |
           sleep 10
-          curl http://localhost:8001/
+          curl http://192.168.29.5:8001/
 
-      - name: Cleanup
-        if: always()
+
+  cleanup:
+    runs-on: self-hosted
+    needs: health-check
+    if: always()
+    steps:
+      - name: Cleanup Container
         run: |
           docker rm -f farm-test || true
-
-
 
