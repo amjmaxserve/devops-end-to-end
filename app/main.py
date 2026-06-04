@@ -1,9 +1,17 @@
-from fastapi import FastAPI
+from fastapi import (
+    FastAPI,
+    Response,
+    status
+    )
 
 from app.routes.inventory import router as inventory_router
 
 from app.database import engine
 from app.models.inventory_model import Base
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.service.health_servce import check_database
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -22,7 +30,21 @@ def home():
     }
 
 @app.get("/health")
-def health():
+def health(
+    response: Response,
+    db: Session = Depends(get_db)
+):
+    database_status = check_database(db)
+
+    if database_status:
+        return {
+            "status": "healthy",
+            "database": "connected"
+        }
+
+    response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
     return {
-        "status": "healthy"
+        "status": "unhealthy",
+        "database": "disconnected"
     }
