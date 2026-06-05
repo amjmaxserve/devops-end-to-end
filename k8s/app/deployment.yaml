@@ -22,6 +22,7 @@ spec:
       labels:
         app: farm-inventory
     spec:
+      serviceAccountName: farm-service-account
       containers:
         - name: farm-inventory
           image: arjunmj/farm-inventory:latest

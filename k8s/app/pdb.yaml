@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+
+metadata:
+  name: farm-inventory-pdb
+  namespace: farm
+
+spec:
+  minAvailable: 1
+
+  selector:
+    matchLabels:
+      app: farm-inventory
