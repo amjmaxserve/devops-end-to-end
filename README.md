@@ -118,6 +118,37 @@ Verify Rollout
 
 ---
 
+## Kubernetes Features Implemented
+
+- Namespace Isolation
+- ConfigMaps
+- Secrets
+- Deployments
+- Services
+- Ingress (Traefik)
+- Persistent Volumes
+- Health Checks
+- Startup Probes
+- Readiness Probes
+- Liveness Probes
+- Horizontal Pod Autoscaler (HPA)
+- Pod Disruption Budget (PDB)
+- RBAC (ServiceAccount, Role, RoleBinding)
+- Rolling Updates
+- Rollbacks
+
+## DevOps Features Implemented
+
+- GitHub Actions CI/CD
+- Self Hosted Runner
+- Docker Build Automation
+- Docker Hub Integration
+- Trivy Security Scanning
+- Automated Kubernetes Deployment
+- Docker Image Retention Policy
+
+---
+
 ## Current Project Status
 
 Version: v1.0.0
