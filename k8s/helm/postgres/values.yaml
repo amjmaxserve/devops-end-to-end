@@ -1,0 +1,40 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "17"
+  pullPolicy: IfNotPresent
+
+database:
+  name: farmdb
+
+secret:
+  username: postgres
+  password: postgres123
+
+persistence:
+  size: 2Gi
+
+service:
+  type: ClusterIP
+  port: 5432
+
+resources:
+  requests:
+    memory: 256Mi
+    cpu: 100m
+
+  limits:
+    memory: 512Mi
+    cpu: 500m
+
+probes:
+  readiness:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+  liveness:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 10
