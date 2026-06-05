@@ -1,0 +1,9 @@
+dependencies:
+- name: farm-app
+  repository: file://charts/farm-app
+  version: 1.0.0
+- name: postgres
+  repository: file://charts/postgres
+  version: 1.0.0
+digest: sha256:fd5a880bbe40f4632bfa64664cf3574b392070b9bba22eb7e29ebfe351e44def
+generated: "2026-06-05T06:53:52.802830501Z"

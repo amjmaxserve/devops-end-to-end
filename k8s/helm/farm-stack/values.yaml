@@ -1,0 +1,5 @@
+farm-app:
+  replicaCount: 2
+
+postgres:
+  replicaCount: 1
