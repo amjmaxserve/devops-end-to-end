@@ -57,6 +57,7 @@ jobs:
         run: |
           docker push $IMAGE_NAME:latest
           docker push $IMAGE_NAME:${{ github.run_number }}
+          docker pusj $IMAGE_NAME: prod
 
   helm-deploy:
     runs-on: self-hosted
