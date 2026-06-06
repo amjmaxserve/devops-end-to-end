@@ -1,0 +1,128 @@
+---
+name: Farm Stack CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: arjunmj/farm-stack
+  HELM_CHART_PATH: ./k8s/helm/farm-stack
+  NAMESPACE: farm-stack
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -f docker/Dockerfile \
+            -t $IMAGE_NAME:latest \
+            -t $IMAGE_NAME:${{ github.run_number }} \
+            .
+
+      - name: Verify Image
+        run: |
+          docker images | grep farm-stack
+
+  trivy-scan:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Scan Docker Image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: arjunmj/farm-stack:${{ github.run_number }}
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+  push-image:
+    runs-on: self-hosted
+    needs: trivy-scan
+    steps:
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push Images
+        run: |
+          docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME:${{ github.run_number }}
+
+  helm-deploy:
+    runs-on: self-hosted
+    needs: push-image
+    env:
+      KUBECONFIG: /home/devops/.kube/config
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Verify Cluster
+        run: |
+          kubectl get nodes
+
+      - name: Verify Namespace
+        run: |
+          kubectl get ns $NAMESPACE
+      - name: Helm Upgrade
+        run: |
+          helm upgrade --install farm-stack \
+            $HELM_CHART_PATH \
+            -n $NAMESPACE \
+            -f $HELM_CHART_PATH/values-prod.yaml \
+            --set farm-app.image.tag=${{ github.run_number }}
+
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status \
+            deployment/farm-inventory \
+            -n $NAMESPACE \
+            --timeout=300s
+
+  verify:
+    runs-on: self-hosted
+    needs: helm-deploy
+    env:
+      KUBECONFIG: /home/devops/.kube/config
+    steps:
+      - name: Pods
+        run: |
+          kubectl get pods -n $NAMESPACE
+
+      - name: Deployments
+        run: |
+          kubectl get deployment -n $NAMESPACE
+
+      - name: Services
+        run: |
+          kubectl get svc -n $NAMESPACE
+
+      - name: HPA
+        run: |
+          kubectl get hpa -n $NAMESPACE
+
+      - name: Ingress
+        run: |
+          kubectl get ingress -n $NAMESPACE
+
+      - name: Health Check
+        run: |
+          curl -H "Host: farm-inventory.local" \
+            http://192.168.29.5/
+
+  cleanup-images:
+    runs-on: self-hosted
+    needs: push-image
+    steps:
+      - name: Cleanup Local Docker Images
+        run: |
+         docker image prune -af || true

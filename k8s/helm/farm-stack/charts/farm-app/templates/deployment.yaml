@@ -7,13 +7,14 @@ metadata:
 spec:
   {{- if not .Values.hpa.enabled}}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   strategy:
     type: {{ .Values.deploymentStrategy.type }}
 
     rollingUpdate:
       maxSurge: {{ .Values.deploymentStrategy.rollingUpdate.maxSurge}}
-      maxUnavaliable: {{ .Values.deploymentStrategy.rollingUpdate.maxUnavailable }}
-  {{- end }}
+      maxUnavailable: {{ .Values.deploymentStrategy.rollingUpdate.maxUnavailable }}
+
   selector:
     matchLabels:
       app: farm-inventory

@@ -1,0 +1,19 @@
+farm-app:
+
+  replicaCount: 5
+
+  hpa:
+    minReplicas: 5
+    maxReplicas: 10
+
+  image:
+    tag: prod
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+
+    limits:
+      cpu: 2
+      memory: 2Gi
