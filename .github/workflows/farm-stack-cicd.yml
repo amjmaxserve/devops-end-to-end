@@ -123,6 +123,34 @@ jobs:
     runs-on: self-hosted
     needs: push-image
     steps:
-      - name: Cleanup Local Docker Images
-        run: |
-         docker image prune -af || true
+        - name: Cleanup Docker Hub Tags
+          env:
+            DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+            DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+            REPOSITORY: farm-stack
+          run: |
+            TOKEN=$(curl -s \
+            -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"username\":\"$DOCKER_USER\",\"password\":\"$DOCKER_TOKEN\"}" \
+            https://hub.docker.com/v2/users/login/ \
+            | jq -r .token)
+            
+            TAGS=$(curl -s \
+            -H "Authorization: JWT $TOKEN" \
+            "https://hub.docker.com/v2/repositories/$DOCKER_USER/$REPOSITORY/tags/?page_size=100" \
+            | jq -r '.results[].name')
+
+            OLD_TAGS=$(echo "$TAGS" \
+            | grep -E '^[0-9]+$' \
+            | sort -n \
+            | head -n -10)
+
+            for tag in $OLD_TAGS
+            do
+                echo "Deleting $tag"
+
+            curl -s -X DELETE \
+                -H "Authorization: JWT $TOKEN" \
+                "https://hub.docker.com/v2/repositories/$DOCKER_USER/$REPOSITORY/tags/$tag/"
+            done
