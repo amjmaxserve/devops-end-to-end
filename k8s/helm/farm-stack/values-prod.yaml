@@ -3,7 +3,7 @@ farm-app:
   replicaCount: 5
 
   hpa:
-    minReplicas: 5
+    minReplicas: 7
     maxReplicas: 10
 
   image:
