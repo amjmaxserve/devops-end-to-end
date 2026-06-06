@@ -1,7 +1,7 @@
 replicaCount: 3
 
 image:
-  repository: arjunmj/farm-inventory
+  repository: arjunmj/farm-stack
   tag: latest
   pullPolicy: Always
 

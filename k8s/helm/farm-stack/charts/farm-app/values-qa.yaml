@@ -1,0 +1,14 @@
+replicaCount: 3
+
+image:
+  tag: qa
+
+resources:
+
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+  limits:
+    cpu: 1
+    memory: 512Mi

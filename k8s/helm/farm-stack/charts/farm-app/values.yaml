@@ -1,7 +1,7 @@
 replicaCount: 3
 
 image:
-  repository: arjunmj/farm-inventory
+  repository: arjunmj/farm-stack
   tag: latest
   pullPolicy: Always
 
@@ -20,9 +20,18 @@ config:
   company: Amjmax Solutions
 
 database:
-  host: postgres-service.database.svc.cluster.local
+  host: postgres-service
   port: "5432"
   name: farmdb
+
+initContainer:
+  enabled: true
+
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0 
 
 secret:
   dbUser: postgres

@@ -1,5 +1,5 @@
 ---
-# Source: farm-app/templates/pdb.yaml
+# Source: farm-stack/charts/farm-app/templates/pdb.yaml
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 
@@ -13,14 +13,14 @@ spec:
     matchLabels:
       app: farm-inventory
 ---
-# Source: farm-app/templates/serviceaccount.yaml
+# Source: farm-stack/charts/farm-app/templates/serviceaccount.yaml
 apiVersion: v1
 kind: ServiceAccount
 
 metadata:
   name: farm-service-account
 ---
-# Source: farm-app/templates/secret.yaml
+# Source: farm-stack/charts/farm-app/templates/secret.yaml
 apiVersion: v1
 kind: Secret
 
@@ -33,7 +33,21 @@ data:
   DB_USER: cG9zdGdyZXM=
   DB_PASSWORD: cG9zdGdyZXMxMjM=
 ---
-# Source: farm-app/templates/configmap.yaml
+# Source: farm-stack/charts/postgres/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: postgres-secret
+
+type: Opaque
+
+data:
+  POSTGRES_USER: cG9zdGdyZXM=
+  POSTGRES_PASSWORD: cG9zdGdyZXMxMjM=
+  POSTGRES_DB: ZmFybWRi
+---
+# Source: farm-stack/charts/farm-app/templates/configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 
@@ -49,7 +63,22 @@ data:
   DB_PORT: "5432"
   DB_NAME: "farmdb"
 ---
-# Source: farm-app/templates/role.yaml
+# Source: farm-stack/charts/postgres/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+
+metadata:
+  name: postgres-pvc
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 2Gi
+---
+# Source: farm-stack/charts/farm-app/templates/role.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 
@@ -67,7 +96,7 @@ rules:
       - list
       - watch
 ---
-# Source: farm-app/templates/rolebinding.yaml
+# Source: farm-stack/charts/farm-app/templates/rolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 
@@ -83,7 +112,7 @@ roleRef:
   kind: Role
   name: farm-role
 ---
-# Source: farm-app/templates/service.yaml
+# Source: farm-stack/charts/farm-app/templates/service.yaml
 apiVersion: v1
 kind: Service
 
@@ -102,7 +131,24 @@ spec:
       targetPort: 8000
       nodePort: 30080
 ---
-# Source: farm-app/templates/deployment.yaml
+# Source: farm-stack/charts/postgres/templates/service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: postgres-service
+
+spec:
+  selector:
+    app: postgres
+
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+  type: ClusterIP
+---
+# Source: farm-stack/charts/farm-app/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 
@@ -110,8 +156,6 @@ metadata:
   name: farm-inventory
 
 spec:
-  replicas: 2
-
   selector:
     matchLabels:
       app: farm-inventory
@@ -127,7 +171,7 @@ spec:
       containers:
         - name: farm-inventory
 
-          image: "arjunmj/farm-inventory:latest"
+          image: "arjunmj/farm-stack:latest"
 
           imagePullPolicy: Always
 
@@ -217,7 +261,97 @@ spec:
               memory: 256Mi
               cpu: 500m
 ---
-# Source: farm-app/templates/hpa.yaml
+# Source: farm-stack/charts/postgres/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: postgres
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: postgres
+
+  template:
+    metadata:
+      labels:
+        app: postgres
+
+    spec:
+      containers:
+
+        - name: postgres
+
+          image: "postgres:17"
+
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 5432
+
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+
+            limits:
+              memory: 512Mi
+              cpu: 500m
+        
+
+          readinessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+
+            initialDelaySeconds: 10
+            periodSeconds: 5
+        
+          livenessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+# Source: farm-stack/charts/farm-app/templates/hpa.yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 
@@ -231,7 +365,7 @@ spec:
     name: farm-inventory
 
   minReplicas: 2
-  maxReplicas: 5
+  maxReplicas: 6
 
   behavior:
     scaleUp:
@@ -259,7 +393,7 @@ spec:
           type: Utilization
           averageUtilization: 70
 ---
-# Source: farm-app/templates/ingress.yaml
+# Source: farm-stack/charts/farm-app/templates/ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 
