@@ -11,6 +11,11 @@ from app.routes.inventory import router as inventory_router
 from app.database import engine, get_db
 from app.models.inventory_model import Base
 from app.services.health_service import check_database
+from prometheus_client import generate_latest
+from prometheus_client import CONTENT_TYPE_LATEST
+from fastapi import Response
+from app.middleware.prometheus import PrometheusMiddleware
+
 
 from app.exceptions import (
     InventoryNotFoundException,
@@ -32,6 +37,9 @@ app.include_router(
     tags=["Inventory"]
 )
 
+app.add_middleware(
+    PrometheusMiddleware
+)
 
 @app.get("/")
 def home():
@@ -61,3 +69,11 @@ def health(
         "database": "disconnected",
         "service": "farm-inventory"
     }
+
+@app.get("/metrics")
+def metrics():
+
+    return Response(
+        generate_latest(),
+        media_type=CONTENT_TYPE_LATEST
+    )
