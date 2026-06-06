@@ -1,0 +1,16 @@
+kube-prometheus-stack:
+
+  grafana:
+
+    adminPassword: admin123
+
+    service:
+      type: NodePort
+
+  prometheus:
+
+    prometheusSpec:
+      retention: 7d
+
+  alertmanager:
+    enabled: true
