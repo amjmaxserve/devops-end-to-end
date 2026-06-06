@@ -6,6 +6,13 @@ kube-prometheus-stack:
 
     service:
       type: NodePort
+    ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - grafana.local
+    path: /
+    pathType: Prefix
 
   prometheus:
 
@@ -15,10 +22,4 @@ kube-prometheus-stack:
   alertmanager:
     enabled: true
   
-  ingress:
-    enabled: true
-    ingressClassName: traefik
-    hosts:
-      - grafana.local
-    path: /
-    pathType: Prefix
+  
