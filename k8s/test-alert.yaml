@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: farm-test-alert
+  namespace: monitoring
+
+spec:
+  groups:
+  - name: farm-test
+    rules:
+
+    - alert: FarmInventoryAlwaysFiring
+
+      expr: vector(1)
+
+      for: 1m
+
+      labels:
+        severity: warning
+
+      annotations:
+        summary: "Farm Inventory Test Alert"
+        description: "Testing Alertmanager email delivery"

@@ -33,6 +33,21 @@ kube-prometheus-stack:
       pathType: Prefix
 
   alertmanager:
+    alertmanagerSpec:
+      config:
+        globals:
+          smtp_smarthost: "smtp.gmail.com:587"
+          smtp_from: "amjmaxserve@gmail.com"
+          smtp_auth_username: "amjmaxserve@gmail.com"
+          smtp_auth_password: "qrbdndciedcuxzfy"
+        route:
+          receiver: email-notification
+        receivers:
+          - name: email-notification
+            email_configs:
+              - to "arjunmjbhr@gmail.com"
+                send_resolved: true 
+
     enabled: true
     ingress:
       enabled: true
@@ -43,3 +58,4 @@ kube-prometheus-stack:
         - /
       pathType: Prefix
   
+# qrbd ndci edcu xzfy
