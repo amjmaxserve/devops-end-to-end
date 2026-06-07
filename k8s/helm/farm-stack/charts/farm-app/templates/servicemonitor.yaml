@@ -1,0 +1,27 @@
+{{- if .Values.monitoring.enabled }}
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+
+metadata:
+  name: farm-inventory
+
+  labels:
+    release: monitoring-stack
+
+spec:
+
+  selector:
+    matchLabels:
+      app: farm-inventory
+
+  namespaceSelector:
+    matchNames:
+      - farm-stack
+
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+
+{{- end }}

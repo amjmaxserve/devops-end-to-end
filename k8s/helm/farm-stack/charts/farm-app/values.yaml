@@ -115,3 +115,6 @@ hpa:
 pdb:
   enabled: true
   maxUnavailable: 1
+
+monitoring:
+  enabled: true
