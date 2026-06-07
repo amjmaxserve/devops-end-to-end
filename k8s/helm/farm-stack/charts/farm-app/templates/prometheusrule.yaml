@@ -1,0 +1,69 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: farm-inventory-alerts
+  namespace: {{ .Release.Namespace }}
+
+  labels:
+    release: monitoring-stack
+
+spec:
+  groups:
+
+    - name: farm-inventory-alerts
+
+      rules:
+
+        - alert: FarmInventoryAPIDown
+
+          expr: |
+            up{job="farm-inventory"} == 0
+
+          for: 1m
+
+          labels:
+            severity: critical
+
+          annotations:
+            summary: "Farm Inventory API Down"
+            description: "Farm Inventory application is unreachable."
+
+        - alert: FarmInventoryHighResponseTime
+
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum(
+                rate(
+                  farm_inventory_request_duration_seconds_bucket[5m]
+                )
+              ) by (le)
+            ) > 1
+
+          for: 2m
+
+          labels:
+            severity: warning
+
+          annotations:
+            summary: "High API Response Time"
+            description: "95th percentile response time exceeds 1 second."
+
+        - alert: FarmInventoryPodRestarting
+
+          expr: |
+            increase(
+              kube_pod_container_status_restarts_total{
+                namespace="{{ .Release.Namespace }}"
+              }[10m]
+            ) > 3
+
+          for: 5m
+
+          labels:
+            severity: critical
+
+          annotations:
+            summary: "Pod Restarting Frequently"
+            description: "Farm Inventory pod restarted more than 3 times."
