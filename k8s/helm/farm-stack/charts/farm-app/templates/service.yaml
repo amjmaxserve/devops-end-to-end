@@ -3,6 +3,8 @@ kind: Service
 
 metadata:
   name: farm-inventory-service
+  labels:
+    app: farm-inventory
 
 spec:
   type: {{ .Values.service.type }}
@@ -11,7 +13,8 @@ spec:
     app: farm-inventory
 
   ports:
-    - protocol: TCP
+    - name: http 
+      protocol: TCP
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
       nodePort: {{ .Values.service.nodePort }}
