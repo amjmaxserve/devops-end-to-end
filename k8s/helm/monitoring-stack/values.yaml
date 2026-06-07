@@ -22,5 +22,15 @@ kube-prometheus-stack:
     prometheusSpec:
       retention: 7d
 
+    ingress:
+      enabled: true
+
+      ingressClassName: traefik
+      hosts:
+        - prometheus.local
+      paths:
+        - /
+      pathType: Prefix
+
   alertmanager:
     enabled: true
