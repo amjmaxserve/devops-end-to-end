@@ -75,6 +75,11 @@ jobs:
       - name: Verify Namespace
         run: |
           kubectl get ns $NAMESPACE
+      
+      - name: Debug Cluster
+        run: |
+          kubectl config current-context
+          kubectl get prometheusrule postgres-alerts -n farm-stack -o yaml || true
       - name: Helm Upgrade
         run: |
           helm upgrade --install farm-stack \
