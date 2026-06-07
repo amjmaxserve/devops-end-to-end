@@ -1,0 +1,170 @@
+NAMESPACE     NAME                                                         READY   STATUS      RESTARTS     AGE
+argocd        pod/argocd-application-controller-0                          1/1     Running     1 (8h ago)   32h
+argocd        pod/argocd-dex-server-569b757-5spkg                          1/1     Running     1 (8h ago)   32h
+argocd        pod/argocd-notifications-controller-58ff87546-s5b45          1/1     Running     1 (8h ago)   32h
+argocd        pod/argocd-redis-b9496d8bf-j4pz4                             1/1     Running     1 (8h ago)   32h
+argocd        pod/argocd-repo-server-75ffcfc9df-sv825                      1/1     Running     1 (8h ago)   32h
+argocd        pod/argocd-server-76755b46f8-m5v6k                           1/1     Running     1 (8h ago)   32h
+farm-stack    pod/farm-inventory-76cc66b7b6-kpfs7                          1/1     Running     0            124m
+farm-stack    pod/farm-inventory-76cc66b7b6-rs9rq                          1/1     Running     1 (8h ago)   32h
+farm-stack    pod/farm-inventory-76cc66b7b6-t9rmr                          1/1     Running     1 (8h ago)   32h
+farm-stack    pod/postgres-66cd96cdd5-6xj5p                                1/1     Running     1 (8h ago)   35h
+farm-stack    pod/postgres-exporter-867668d776-xp67x                       1/1     Running     0            70m
+kube-system   pod/coredns-8db54c48d-nh7zp                                  1/1     Running     1 (8h ago)   3d14h
+kube-system   pod/helm-install-traefik-crd-4p8db                           0/1     Completed   0            3d14h
+kube-system   pod/helm-install-traefik-p6vb5                               0/1     Completed   1            3d14h
+kube-system   pod/local-path-provisioner-5d9d9885bc-zzq9f                  1/1     Running     1 (8h ago)   3d14h
+kube-system   pod/metrics-server-786d997795-gc86x                          1/1     Running     1 (8h ago)   3d14h
+kube-system   pod/svclb-traefik-0e6dc5c0-nd5rw                             2/2     Running     2 (8h ago)   3d14h
+kube-system   pod/traefik-9bcdbbd9-q7rk5                                   1/1     Running     1 (8h ago)   3d14h
+monitoring    pod/alertmanager-monitoring-stack-kube-prom-alertmanager-0   2/2     Running     0            4h48m
+monitoring    pod/monitoring-stack-grafana-6d85949787-pxqmt                3/3     Running     3 (8h ago)   28h
+monitoring    pod/monitoring-stack-kube-prom-operator-866b49c679-hndzf     1/1     Running     1 (8h ago)   29h
+monitoring    pod/monitoring-stack-kube-state-metrics-5ff6659698-22spd     1/1     Running     1 (8h ago)   29h
+monitoring    pod/monitoring-stack-prometheus-node-exporter-jz59f          1/1     Running     1 (8h ago)   29h
+monitoring    pod/prometheus-monitoring-stack-kube-prom-prometheus-0       2/2     Running     0            7h35m
+
+NAMESPACE     NAME                                                         TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)                        AGE
+argocd        service/argocd-applicationset-controller                     ClusterIP      10.43.122.12    <none>         7000/TCP,8080/TCP              32h
+argocd        service/argocd-dex-server                                    ClusterIP      10.43.163.8     <none>         5556/TCP,5557/TCP,5558/TCP     32h
+argocd        service/argocd-metrics                                       ClusterIP      10.43.160.128   <none>         8082/TCP                       32h
+argocd        service/argocd-notifications-controller-metrics              ClusterIP      10.43.168.126   <none>         9001/TCP                       32h
+argocd        service/argocd-redis                                         ClusterIP      10.43.241.36    <none>         6379/TCP                       32h
+argocd        service/argocd-repo-server                                   ClusterIP      10.43.181.73    <none>         8081/TCP,8084/TCP              32h
+argocd        service/argocd-server                                        NodePort       10.43.111.126   <none>         80:30706/TCP,443:32185/TCP     32h
+argocd        service/argocd-server-metrics                                ClusterIP      10.43.171.94    <none>         8083/TCP                       32h
+default       service/kubernetes                                           ClusterIP      10.43.0.1       <none>         443/TCP                        3d14h
+farm-stack    service/farm-inventory-service                               NodePort       10.43.189.171   <none>         8000:30080/TCP                 35h
+farm-stack    service/postgres-exporter                                    ClusterIP      10.43.147.68    <none>         9187/TCP                       125m
+farm-stack    service/postgres-service                                     ClusterIP      10.43.188.141   <none>         5432/TCP                       35h
+kube-system   service/kube-dns                                             ClusterIP      10.43.0.10      <none>         53/UDP,53/TCP,9153/TCP         3d14h
+kube-system   service/metrics-server                                       ClusterIP      10.43.129.113   <none>         443/TCP                        3d14h
+kube-system   service/monitoring-kube-prometheus-coredns                   ClusterIP      None            <none>         9153/TCP                       31h
+kube-system   service/monitoring-kube-prometheus-kube-controller-manager   ClusterIP      None            <none>         10257/TCP                      31h
+kube-system   service/monitoring-kube-prometheus-kube-etcd                 ClusterIP      None            <none>         2381/TCP                       31h
+kube-system   service/monitoring-kube-prometheus-kube-proxy                ClusterIP      None            <none>         10249/TCP                      31h
+kube-system   service/monitoring-kube-prometheus-kube-scheduler            ClusterIP      None            <none>         10259/TCP                      31h
+kube-system   service/monitoring-kube-prometheus-kubelet                   ClusterIP      None            <none>         10250/TCP,4194/TCP,10255/TCP   31h
+kube-system   service/monitoring-stack-kube-prom-coredns                   ClusterIP      None            <none>         9153/TCP                       29h
+kube-system   service/monitoring-stack-kube-prom-kube-controller-manager   ClusterIP      None            <none>         10257/TCP                      29h
+kube-system   service/monitoring-stack-kube-prom-kube-etcd                 ClusterIP      None            <none>         2381/TCP                       29h
+kube-system   service/monitoring-stack-kube-prom-kube-proxy                ClusterIP      None            <none>         10249/TCP                      29h
+kube-system   service/monitoring-stack-kube-prom-kube-scheduler            ClusterIP      None            <none>         10259/TCP                      29h
+kube-system   service/monitoring-stack-kube-prom-kubelet                   ClusterIP      None            <none>         10250/TCP,10255/TCP,4194/TCP   29h
+kube-system   service/traefik                                              LoadBalancer   10.43.49.7      192.168.29.5   80:31433/TCP,443:30200/TCP     3d14h
+monitoring    service/alertmanager-operated                                ClusterIP      None            <none>         9093/TCP,9094/TCP,9094/UDP     29h
+monitoring    service/monitoring-stack-grafana                             NodePort       10.43.133.90    <none>         80:30668/TCP                   29h
+monitoring    service/monitoring-stack-kube-prom-alertmanager              ClusterIP      10.43.32.101    <none>         9093/TCP,8080/TCP              29h
+monitoring    service/monitoring-stack-kube-prom-operator                  ClusterIP      10.43.148.217   <none>         443/TCP                        29h
+monitoring    service/monitoring-stack-kube-prom-prometheus                ClusterIP      10.43.240.127   <none>         9090/TCP,8080/TCP              29h
+monitoring    service/monitoring-stack-kube-state-metrics                  ClusterIP      10.43.48.134    <none>         8080/TCP                       29h
+monitoring    service/monitoring-stack-prometheus-node-exporter            ClusterIP      10.43.27.177    <none>         9100/TCP                       29h
+monitoring    service/prometheus-operated                                  ClusterIP      None            <none>         9090/TCP                       29h
+
+NAMESPACE     NAME                                                       DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+kube-system   daemonset.apps/svclb-traefik-0e6dc5c0                      1         1         1       1            1           <none>                   3d14h
+monitoring    daemonset.apps/monitoring-stack-prometheus-node-exporter   1         1         1       1            1           kubernetes.io/os=linux   29h
+
+NAMESPACE     NAME                                                  READY   UP-TO-DATE   AVAILABLE   AGE
+argocd        deployment.apps/argocd-applicationset-controller      0/0     0            0           32h
+argocd        deployment.apps/argocd-dex-server                     1/1     1            1           32h
+argocd        deployment.apps/argocd-notifications-controller       1/1     1            1           32h
+argocd        deployment.apps/argocd-redis                          1/1     1            1           32h
+argocd        deployment.apps/argocd-repo-server                    1/1     1            1           32h
+argocd        deployment.apps/argocd-server                         1/1     1            1           32h
+farm-stack    deployment.apps/farm-inventory                        3/3     3            3           35h
+farm-stack    deployment.apps/postgres                              1/1     1            1           35h
+farm-stack    deployment.apps/postgres-exporter                     1/1     1            1           125m
+kube-system   deployment.apps/coredns                               1/1     1            1           3d14h
+kube-system   deployment.apps/local-path-provisioner                1/1     1            1           3d14h
+kube-system   deployment.apps/metrics-server                        1/1     1            1           3d14h
+kube-system   deployment.apps/traefik                               1/1     1            1           3d14h
+monitoring    deployment.apps/monitoring-stack-grafana              1/1     1            1           29h
+monitoring    deployment.apps/monitoring-stack-kube-prom-operator   1/1     1            1           29h
+monitoring    deployment.apps/monitoring-stack-kube-state-metrics   1/1     1            1           29h
+
+NAMESPACE     NAME                                                             DESIRED   CURRENT   READY   AGE
+argocd        replicaset.apps/argocd-applicationset-controller-b7669f646       0         0         0       32h
+argocd        replicaset.apps/argocd-dex-server-569b757                        1         1         1       32h
+argocd        replicaset.apps/argocd-notifications-controller-58ff87546        1         1         1       32h
+argocd        replicaset.apps/argocd-redis-b9496d8bf                           1         1         1       32h
+argocd        replicaset.apps/argocd-repo-server-75ffcfc9df                    1         1         1       32h
+argocd        replicaset.apps/argocd-server-76755b46f8                         1         1         1       32h
+farm-stack    replicaset.apps/farm-inventory-546f4dcd8                         0         0         0       3h53m
+farm-stack    replicaset.apps/farm-inventory-565ff7c584                        0         0         0       32m
+farm-stack    replicaset.apps/farm-inventory-5ddfdcdc46                        0         0         0       151m
+farm-stack    replicaset.apps/farm-inventory-5ffccf675b                        0         0         0       125m
+farm-stack    replicaset.apps/farm-inventory-689766658b                        0         0         0       5h20m
+farm-stack    replicaset.apps/farm-inventory-7565c587cc                        0         0         0       70m
+farm-stack    replicaset.apps/farm-inventory-76cc66b7b6                        3         3         3       34h
+farm-stack    replicaset.apps/farm-inventory-85f6c69dd9                        0         0         0       3h18m
+farm-stack    replicaset.apps/farm-inventory-85fbf87ccc                        0         0         0       5h42m
+farm-stack    replicaset.apps/farm-inventory-c496dcdff                         0         0         0       20m
+farm-stack    replicaset.apps/farm-inventory-c674b86b7                         0         0         0       5h1m
+farm-stack    replicaset.apps/postgres-66cd96cdd5                              1         1         1       35h
+farm-stack    replicaset.apps/postgres-exporter-867668d776                     1         1         1       70m
+farm-stack    replicaset.apps/postgres-exporter-fc988df54                      0         0         0       125m
+kube-system   replicaset.apps/coredns-8db54c48d                                1         1         1       3d14h
+kube-system   replicaset.apps/local-path-provisioner-5d9d9885bc                1         1         1       3d14h
+kube-system   replicaset.apps/metrics-server-786d997795                        1         1         1       3d14h
+kube-system   replicaset.apps/traefik-9bcdbbd9                                 1         1         1       3d14h
+monitoring    replicaset.apps/monitoring-stack-grafana-6468cb87f6              0         0         0       29h
+monitoring    replicaset.apps/monitoring-stack-grafana-6d85949787              1         1         1       28h
+monitoring    replicaset.apps/monitoring-stack-kube-prom-operator-866b49c679   1         1         1       29h
+monitoring    replicaset.apps/monitoring-stack-kube-state-metrics-5ff6659698   1         1         1       29h
+
+NAMESPACE    NAME                                                                    READY   AGE
+argocd       statefulset.apps/argocd-application-controller                          1/1     32h
+monitoring   statefulset.apps/alertmanager-monitoring-stack-kube-prom-alertmanager   1/1     29h
+monitoring   statefulset.apps/prometheus-monitoring-stack-kube-prom-prometheus       1/1     29h
+
+NAMESPACE    NAME                                                     REFERENCE                   TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+farm-stack   horizontalpodautoscaler.autoscaling/farm-inventory-hpa   Deployment/farm-inventory   cpu: 0%/70%   3         5         3          35h
+
+NAMESPACE     NAME                                 STATUS     COMPLETIONS   DURATION   AGE
+kube-system   job.batch/helm-install-traefik       Complete   1/1           59s        3d14h
+kube-system   job.batch/helm-install-traefik-crd   Complete   1/1           58s        3d14h
+NAME                     CLASS     HOSTS                  ADDRESS        PORTS   AGE
+farm-inventory-ingress   traefik   farm-inventory.local   192.168.29.5   80      35h
+NAME                AGE
+farm-inventory      7h21m
+postgres-exporter   125m
+NAMESPACE    NAME                                                              AGE
+farm-stack   farm-inventory-alerts                                             152m
+farm-stack   postgres-alerts                                                   50m
+monitoring   email-test                                                        11m
+monitoring   monitoring-stack-kube-prom-alertmanager.rules                     29h
+monitoring   monitoring-stack-kube-prom-config-reloaders                       29h
+monitoring   monitoring-stack-kube-prom-etcd                                   29h
+monitoring   monitoring-stack-kube-prom-general.rules                          29h
+monitoring   monitoring-stack-kube-prom-k8s.rules.container-cpu-usage-second   29h
+monitoring   monitoring-stack-kube-prom-k8s.rules.container-memory-cache       29h
+monitoring   monitoring-stack-kube-prom-k8s.rules.container-memory-rss         29h
+monitoring   monitoring-stack-kube-prom-k8s.rules.container-memory-swap        29h
+monitoring   monitoring-stack-kube-prom-k8s.rules.container-memory-working-s   29h
+monitoring   monitoring-stack-kube-prom-k8s.rules.container-resource           29h
+monitoring   monitoring-stack-kube-prom-k8s.rules.pod-owner                    29h
+monitoring   monitoring-stack-kube-prom-kube-apiserver-availability.rules      29h
+monitoring   monitoring-stack-kube-prom-kube-apiserver-burnrate.rules          29h
+monitoring   monitoring-stack-kube-prom-kube-apiserver-histogram.rules         29h
+monitoring   monitoring-stack-kube-prom-kube-apiserver-slos                    29h
+monitoring   monitoring-stack-kube-prom-kube-prometheus-general.rules          29h
+monitoring   monitoring-stack-kube-prom-kube-prometheus-node-recording.rules   29h
+monitoring   monitoring-stack-kube-prom-kube-scheduler.rules                   29h
+monitoring   monitoring-stack-kube-prom-kube-state-metrics                     29h
+monitoring   monitoring-stack-kube-prom-kubelet.rules                          29h
+monitoring   monitoring-stack-kube-prom-kubernetes-apps                        29h
+monitoring   monitoring-stack-kube-prom-kubernetes-resources                   29h
+monitoring   monitoring-stack-kube-prom-kubernetes-storage                     29h
+monitoring   monitoring-stack-kube-prom-kubernetes-system                      29h
+monitoring   monitoring-stack-kube-prom-kubernetes-system-apiserver            29h
+monitoring   monitoring-stack-kube-prom-kubernetes-system-controller-manager   29h
+monitoring   monitoring-stack-kube-prom-kubernetes-system-kube-proxy           29h
+monitoring   monitoring-stack-kube-prom-kubernetes-system-kubelet              29h
+monitoring   monitoring-stack-kube-prom-kubernetes-system-scheduler            29h
+monitoring   monitoring-stack-kube-prom-node-exporter                          29h
+monitoring   monitoring-stack-kube-prom-node-exporter.rules                    29h
+monitoring   monitoring-stack-kube-prom-node-network                           29h
+monitoring   monitoring-stack-kube-prom-node.rules                             29h
+monitoring   monitoring-stack-kube-prom-prometheus                             29h
+monitoring   monitoring-stack-kube-prom-prometheus-operator                    29h
