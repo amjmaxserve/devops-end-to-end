@@ -73,3 +73,6 @@ spec:
           annotations:
             summary: "Pod Restarting Frequently"
             description: "Farm Inventory pod restarted more than 3 times."
+        
+
+        

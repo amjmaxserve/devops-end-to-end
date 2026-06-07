@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: postgres-alerts
+  labels:
+    release: monitoring-stack
+
+spec:
+  groups:
+    - name: postgres-alerts
+
+      rules:
+
+        - alert: PostgreSQLDown
+          expr: pg_up == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: PostgreSQL Down
+            description: PostgreSQL exporter cannot connect to database.
+
+        - alert: PostgreSQLHighConnections
+          expr: pg_stat_database_numbackends > 50
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: High PostgreSQL Connections
+            description: Database connections exceeded threshold.
+
+        - alert: PostgreSQLDeadlocks
+          expr: increase(pg_stat_database_deadlocks[5m]) > 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: PostgreSQL Deadlock Detected
+            description: One or more deadlocks occurred.
