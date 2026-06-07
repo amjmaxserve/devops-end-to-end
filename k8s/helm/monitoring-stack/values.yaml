@@ -56,10 +56,10 @@ kube-prometheus-stack:
         group_wait: 30s
         group_interval: 5m
         repeat_interval: 4h
-        reciever: email-notification
-      recievers:
+        receiver: email-notification
+      receivers:
         - name: email-notification
-          email_config:
+          email_configs:
             - to: "arjunmjbhr@gmail.com"
               send_resolved: true
 
