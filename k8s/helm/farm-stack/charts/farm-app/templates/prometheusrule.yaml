@@ -18,7 +18,13 @@ spec:
         - alert: FarmInventoryAPIDown
 
           expr: |
-            up{job="farm-inventory"} == 0
+            sum(
+              up{
+                namespace= "{{ .Release.Namespace }}",
+                job= "farm-inventory-service"
+              }
+            ) < 1
+                
 
           for: 1m
 
