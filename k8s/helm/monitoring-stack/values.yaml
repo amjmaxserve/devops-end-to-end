@@ -34,3 +34,12 @@ kube-prometheus-stack:
 
   alertmanager:
     enabled: true
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      hosts:
+        - alertmanager.local
+      paths:
+        - /
+      pathType: prefix
+  
