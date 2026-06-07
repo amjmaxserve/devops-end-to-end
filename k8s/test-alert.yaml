@@ -7,17 +7,18 @@ metadata:
 spec:
   groups:
   - name: farm-test
+
     rules:
 
     - alert: FarmInventoryAlwaysFiring
 
       expr: vector(1)
 
-      for: 1m
+      for: 30s
 
       labels:
         severity: warning
 
       annotations:
-        summary: "Farm Inventory Test Alert"
-        description: "Testing Alertmanager email delivery"
+        summary: Farm Inventory Test Alert
+        description: Alertmanager email delivery test
