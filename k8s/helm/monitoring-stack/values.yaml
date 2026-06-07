@@ -41,5 +41,5 @@ kube-prometheus-stack:
         - alertmanager.local
       paths:
         - /
-      pathType: prefix
+      pathType: Prefix
   
