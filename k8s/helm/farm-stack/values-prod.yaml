@@ -7,7 +7,7 @@ farm-app:
     maxReplicas: 5
 
   image:
-    tag: prod
+    tag: 999
 
   resources:
     requests:
