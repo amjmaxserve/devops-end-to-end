@@ -118,3 +118,14 @@ pdb:
 
 monitoring:
   enabled: true
+  
+blueGreen:
+  enabled: true
+
+  activeColor: blue
+
+  blue:
+    enabled: true
+
+  green:
+    enabled: true
