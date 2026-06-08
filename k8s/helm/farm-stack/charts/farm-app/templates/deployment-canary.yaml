@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: farm-inventory
+  name: farm-inventory-canary
 
 spec:
   {{- if not .Values.hpa.enabled}}
-  replicas: {{ .Values.canary.stable.replicas }}
+  replicas: {{ .Values.canary.canary.replicas }}
   {{- end }}
   strategy:
     type: {{ .Values.deploymentStrategy.type }}
@@ -18,13 +18,13 @@ spec:
   selector:
     matchLabels:
       app: farm-inventory
-      track: stable
+      track: canary
 
   template:
     metadata:
       labels:
         app: farm-inventory
-        track: stable
+        track: canary
 
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
@@ -44,7 +44,7 @@ spec:
       containers:
         - name: farm-inventory
 
-          image: "{{ .Values.image.repository }}:{{ .Values.canary.stable.imageTag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.canary.canary.imageTag }}"
 
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
