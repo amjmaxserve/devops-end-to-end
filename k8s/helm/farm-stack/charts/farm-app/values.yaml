@@ -126,6 +126,8 @@ blueGreen:
 
   blue:
     enabled: true
+    imageTag: "35"
 
   green:
     enabled: true
+    imageTag: "34"

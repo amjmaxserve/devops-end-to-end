@@ -11,7 +11,7 @@ spec:
 
   selector:
     app: farm-inventory
-    color: {{ .Values.blueGreen.activateColor }}
+    color: {{ .Values.blueGreen.activeColor }}
 
   ports:
     - name: http 
