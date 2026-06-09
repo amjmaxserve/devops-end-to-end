@@ -102,7 +102,7 @@ hpa:
   enabled: true
 
   stable:
-    minReplicas: 5
+    minReplicas: 1
     maxReplicas: 10
     cpuUtilization: 70
   canary:
