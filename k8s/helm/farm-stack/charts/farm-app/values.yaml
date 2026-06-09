@@ -91,8 +91,8 @@ ingress:
 hpa:
   enabled: true
 
-  minReplicas: 3
-  maxReplicas: 6
+  minReplicas: 9
+  maxReplicas: 20
 
   cpuUtilization: 70
 
