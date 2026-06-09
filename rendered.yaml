@@ -215,7 +215,7 @@ spec:
       containers:
         - name: farm-inventory
 
-          image: "arjunmj/farm-stack:36"
+          image: "arjunmj/farm-stack:35"
 
           imagePullPolicy: Always
 
@@ -323,13 +323,14 @@ spec:
   selector:
     matchLabels:
       app: farm-inventory
-      track: stable
+      
 
   template:
     metadata:
       labels:
         app: farm-inventory
         track: stable
+        
 
     spec:
       serviceAccountName: farm-service-account
@@ -349,7 +350,7 @@ spec:
       containers:
         - name: farm-inventory
 
-          image: "arjunmj/farm-stack:35"
+          image: "arjunmj/farm-stack:34"
 
           imagePullPolicy: Always
 
@@ -562,7 +563,49 @@ spec:
           - name: DATA_SOURCE_NAME
             value: "postgresql://postgres:postgres123@postgres-service:5432/farmdb?sslmode=disable"
 ---
-# Source: farm-stack/charts/farm-app/templates/hpa.yaml
+# Source: farm-stack/charts/farm-app/templates/hpa-canary.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+
+metadata:
+  name: farm-inventory-hpa-canary
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: farm-inventory-canary
+
+  minReplicas: 3
+  maxReplicas: 10
+
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+
+    scaleDown:
+      stabilizationWindowSeconds: 60
+
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+
+        target:
+          type: Utilization
+          averageUtilization: 70
+---
+# Source: farm-stack/charts/farm-app/templates/hpa-stable.yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 
@@ -575,8 +618,8 @@ spec:
     kind: Deployment
     name: farm-inventory
 
-  minReplicas: 3
-  maxReplicas: 6
+  minReplicas: 9
+  maxReplicas: 20
 
   behavior:
     scaleUp:

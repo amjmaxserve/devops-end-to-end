@@ -18,13 +18,14 @@ spec:
   selector:
     matchLabels:
       app: farm-inventory
-      track: stable
+      
 
   template:
     metadata:
       labels:
         app: farm-inventory
         track: stable
+        
 
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}

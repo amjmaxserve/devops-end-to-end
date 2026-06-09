@@ -88,13 +88,33 @@ ingress:
 
   pathType: Prefix
 
+canary: 
+  enabled: true
+  stable:
+    replicas: 9
+    imageTag: "34"
+
+  canary:
+    replicas: 3
+    imageTag: "35"
+
 hpa:
   enabled: true
 
-  minReplicas: 3
-  maxReplicas: 6
+  stable:
+    minReplicas: 9
+    maxReplicas: 20
+    cpuUtilization: 70
+  canary:
+    minReplicas: 3
+    maxReplicas: 10
+    cpuUtilization: 70
 
-  cpuUtilization: 70
+
+  # minReplicas: 5
+  # maxReplicas: 10
+
+  # cpuUtilization: 70
 
   scaleUp:
     stabilizationWindowSeconds: 0
@@ -118,14 +138,3 @@ pdb:
 
 monitoring:
   enabled: true
-
-canary:
-  enabled: true
-
-  stable:
-    replicas: 9
-    imageTag: "34"
-
-  canary:
-    replicas: 1
-    imageTag: "35"

@@ -4,16 +4,16 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 
 metadata:
-  name: farm-inventory-hpa
+  name: farm-inventory-hpa-canary
 
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: farm-inventory
+    name: farm-inventory-canary
 
-  minReplicas: {{ .Values.hpa.minReplicas }}
-  maxReplicas: {{ .Values.hpa.maxReplicas }}
+  minReplicas: {{ .Values.hpa.canary.minReplicas }}
+  maxReplicas: {{ .Values.hpa.canary.maxReplicas }}
 
   behavior:
     scaleUp:
@@ -39,6 +39,6 @@ spec:
 
         target:
           type: Utilization
-          averageUtilization: {{ .Values.hpa.cpuUtilization }}
+          averageUtilization: {{ .Values.hpa.canary.cpuUtilization }}
 
 {{- end }}

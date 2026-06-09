@@ -77,3 +77,10 @@ def metrics():
         generate_latest(),
         media_type=CONTENT_TYPE_LATEST
     )
+
+@app.get("/version")
+def version():
+    return {
+        "version": "35",
+        "track": "canary"
+    }
