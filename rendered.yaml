@@ -1,0 +1,795 @@
+---
+# Source: farm-stack/charts/farm-app/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+
+metadata:
+  name: farm-inventory-pdb
+
+spec:
+  maxUnavailable: 1
+
+  selector:
+    matchLabels:
+      app: farm-inventory
+---
+# Source: farm-stack/charts/farm-app/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+
+metadata:
+  name: farm-service-account
+---
+# Source: farm-stack/charts/farm-app/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: farm-secret
+
+type: Opaque
+
+data:
+  DB_USER: cG9zdGdyZXM=
+  DB_PASSWORD: cG9zdGdyZXMxMjM=
+---
+# Source: farm-stack/charts/postgres/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: postgres-secret
+
+type: Opaque
+
+data:
+  POSTGRES_USER: cG9zdGdyZXM=
+  POSTGRES_PASSWORD: cG9zdGdyZXMxMjM=
+  POSTGRES_DB: ZmFybWRi
+---
+# Source: farm-stack/charts/farm-app/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: farm-inventory-config
+
+data:
+  APP_NAME: "Farm Inventory"
+  ENVIRONMENT: "Development"
+  COMPANY: "Amjmax Solutions"
+
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "farmdb"
+---
+# Source: farm-stack/charts/postgres/templates/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+
+metadata:
+  name: postgres-pvc
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 2Gi
+---
+# Source: farm-stack/charts/farm-app/templates/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+
+metadata:
+  name: farm-role
+
+rules:
+  - apiGroups: [""]
+    resources:
+      - pods
+      - services
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+---
+# Source: farm-stack/charts/farm-app/templates/rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+
+metadata:
+  name: farm-rolebinding
+
+subjects:
+  - kind: ServiceAccount
+    name: farm-service-account
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: farm-role
+---
+# Source: farm-stack/charts/farm-app/templates/service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: farm-inventory-service
+  labels:
+    app: farm-inventory
+
+spec:
+  type: NodePort
+
+  selector:
+    app: farm-inventory
+
+  ports:
+    - name: http 
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30080
+---
+# Source: farm-stack/charts/postgres/templates/postgres-exporter-service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: postgres-exporter
+
+  labels:
+    app: postgres-exporter
+
+spec:
+
+  selector:
+    app: postgres-exporter
+
+  ports:
+    - name: metrics
+      port: 9187
+      targetPort: 9187
+---
+# Source: farm-stack/charts/postgres/templates/service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: postgres-service
+
+spec:
+  selector:
+    app: postgres
+
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+  type: ClusterIP
+---
+# Source: farm-stack/charts/farm-app/templates/deployment-canary.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: farm-inventory-canary
+
+spec:
+  strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  selector:
+    matchLabels:
+      app: farm-inventory
+      track: canary
+
+  template:
+    metadata:
+      labels:
+        app: farm-inventory
+        track: canary
+
+    spec:
+      serviceAccountName: farm-service-account
+
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z postgres-service 5432
+              do
+                echo "waiting for PostgresDB..."
+                sleep 5
+              done
+      containers:
+        - name: farm-inventory
+
+          image: "arjunmj/farm-stack:36"
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8000
+          
+          env:
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: APP_NAME
+
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: ENVIRONMENT
+
+            - name: COMPANY
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: COMPANY
+
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: DB_HOST
+
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: DB_PORT
+
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: DB_NAME
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: farm-secret
+                  key: DB_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: farm-secret
+                  key: DB_PASSWORD
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 12
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+
+            limits:
+              memory: 256Mi
+              cpu: 500m
+---
+# Source: farm-stack/charts/farm-app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: farm-inventory
+
+spec:
+  strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  selector:
+    matchLabels:
+      app: farm-inventory
+      track: stable
+
+  template:
+    metadata:
+      labels:
+        app: farm-inventory
+        track: stable
+
+    spec:
+      serviceAccountName: farm-service-account
+
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z postgres-service 5432
+              do
+                echo "waiting for PostgresDB..."
+                sleep 5
+              done
+      containers:
+        - name: farm-inventory
+
+          image: "arjunmj/farm-stack:35"
+
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8000
+          
+          env:
+            - name: APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: APP_NAME
+
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: ENVIRONMENT
+
+            - name: COMPANY
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: COMPANY
+
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: DB_HOST
+
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: DB_PORT
+
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: farm-inventory-config
+                  key: DB_NAME
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: farm-secret
+                  key: DB_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: farm-secret
+                  key: DB_PASSWORD
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 12
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+
+            limits:
+              memory: 256Mi
+              cpu: 500m
+---
+# Source: farm-stack/charts/postgres/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: postgres
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: postgres
+
+  template:
+    metadata:
+      labels:
+        app: postgres
+
+    spec:
+      containers:
+
+        - name: postgres
+
+          image: "postgres:17"
+
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 5432
+
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+
+            limits:
+              memory: 512Mi
+              cpu: 500m
+        
+
+          readinessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+
+            initialDelaySeconds: 10
+            periodSeconds: 5
+        
+          livenessProbe:
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+# Source: farm-stack/charts/postgres/templates/postgres-exporter-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: postgres-exporter
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: postgres-exporter
+
+  template:
+    metadata:
+      labels:
+        app: postgres-exporter
+
+    spec:
+      containers:
+
+      - name: postgres-exporter
+
+        image: prometheuscommunity/postgres-exporter:v0.17.1
+
+        ports:
+          - containerPort: 9187
+
+        env:
+          - name: DATA_SOURCE_NAME
+            value: "postgresql://postgres:postgres123@postgres-service:5432/farmdb?sslmode=disable"
+---
+# Source: farm-stack/charts/farm-app/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+
+metadata:
+  name: farm-inventory-hpa
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: farm-inventory
+
+  minReplicas: 3
+  maxReplicas: 6
+
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+
+    scaleDown:
+      stabilizationWindowSeconds: 60
+
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+
+        target:
+          type: Utilization
+          averageUtilization: 70
+---
+# Source: farm-stack/charts/farm-app/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: farm-inventory-ingress
+
+spec:
+  ingressClassName: traefik
+
+  rules:
+    - host: farm-inventory.local
+
+      http:
+        paths:
+          - path: /
+
+            pathType: Prefix
+
+            backend:
+              service:
+                name: farm-inventory-service
+
+                port:
+                  number: 8000
+---
+# Source: farm-stack/charts/farm-app/templates/postgres-alerts.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: postgres-alerts
+  labels:
+    release: monitoring-stack
+
+spec:
+  groups:
+    - name: postgres-alerts
+
+      rules:
+
+        - alert: PostgreSQLDown
+          expr: pg_up == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: PostgreSQL Down
+            description: PostgreSQL exporter cannot connect to database.
+
+        - alert: PostgreSQLHighConnections
+          expr: pg_stat_database_numbackends > 50
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: High PostgreSQL Connections
+            description: Database connections exceeded threshold.
+
+        - alert: PostgreSQLDeadlocks
+          expr: increase(pg_stat_database_deadlocks[5m]) > 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: PostgreSQL Deadlock Detected
+            description: One or more deadlocks occurred.
+---
+# Source: farm-stack/charts/farm-app/templates/prometheusrule.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+
+metadata:
+  name: farm-inventory-alerts
+  namespace: farm-stack
+
+  labels:
+    release: monitoring-stack
+
+spec:
+  groups:
+
+    - name: farm-inventory-alerts
+
+      rules:
+
+        - alert: FarmInventoryAPIDown
+
+          expr: |
+            sum(
+              up{
+                namespace= "farm-stack",
+                job= "farm-inventory-service"
+              }
+            ) < 1
+                
+
+          for: 1m
+
+          labels:
+            severity: critical
+
+          annotations:
+            summary: "Farm Inventory API Down"
+            description: "Farm Inventory application is unreachable."
+
+        - alert: FarmInventoryHighResponseTime
+
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum(
+                rate(
+                  farm_inventory_request_duration_seconds_bucket[5m]
+                )
+              ) by (le)
+            ) > 1
+
+          for: 2m
+
+          labels:
+            severity: warning
+
+          annotations:
+            summary: "High API Response Time"
+            description: "95th percentile response time exceeds 1 second."
+
+        - alert: FarmInventoryPodRestarting
+
+          expr: |
+            increase(
+              kube_pod_container_status_restarts_total{
+                namespace="farm-stack"
+              }[10m]
+            ) > 3
+
+          for: 5m
+
+          labels:
+            severity: critical
+
+          annotations:
+            summary: "Pod Restarting Frequently"
+            description: "Farm Inventory pod restarted more than 3 times."
+---
+# Source: farm-stack/charts/farm-app/templates/servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+
+metadata:
+  name: farm-inventory
+
+  labels:
+    release: monitoring-stack
+
+spec:
+
+  selector:
+    matchLabels:
+      app: farm-inventory
+
+  namespaceSelector:
+    matchNames:
+      - farm-stack
+
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+---
+# Source: farm-stack/charts/postgres/templates/postgres-exporter-servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+
+metadata:
+  name: postgres-exporter
+
+  labels:
+    release: monitoring-stack
+
+spec:
+
+  selector:
+    matchLabels:
+      app: postgres-exporter
+
+  endpoints:
+    - port: metrics
+      interval: 30s

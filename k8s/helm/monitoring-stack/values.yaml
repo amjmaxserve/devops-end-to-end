@@ -33,7 +33,7 @@ kube-prometheus-stack:
       pathType: Prefix
 
   alertmanager:
-    enabled: true
+    enabled: false
 
     ingress:
       enabled: true
