@@ -99,15 +99,15 @@ canary:
     imageTag: "35"
 
 hpa:
-  enabled: false
+  enabled: true
 
   stable:
-    minReplicas: 1
+    minReplicas: 3
     maxReplicas: 10
     cpuUtilization: 70
   canary:
-    minReplicas: 9
-    maxReplicas: 20
+    minReplicas: 2
+    maxReplicas: 10
     cpuUtilization: 70
 
 
