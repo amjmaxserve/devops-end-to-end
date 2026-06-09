@@ -1,181 +1,527 @@
-# Farm Inventory System
+# Farm Inventory Platform
 
-## Overview
+## Project Overview
 
-Farm Inventory System is a production-style FastAPI application deployed on Kubernetes (K3s) with PostgreSQL, CI/CD automation, autoscaling, RBAC, and security best practices.
+Farm Inventory is a cloud-native inventory management application built to demonstrate production-grade DevOps practices using Kubernetes, Helm, ArgoCD, Argo Rollouts, Prometheus, PostgreSQL, and GitOps workflows.
 
-This project was built to demonstrate real-world DevOps, Cloud, and Kubernetes concepts including Infrastructure as Code, Continuous Integration, Continuous Deployment, Containerization, Monitoring Readiness, Scalability, and Security.
+The project evolved from a simple FastAPI application into a complete Kubernetes platform supporting multiple deployment strategies, autoscaling, monitoring, security controls, and GitOps-based delivery.
 
 ---
 
-## Technology Stack
+# Project Goals
 
-### Application
+The primary goals of this project were:
+
+* Build a containerized application
+* Deploy to Kubernetes
+* Manage infrastructure using Helm
+* Implement GitOps using ArgoCD
+* Implement multiple deployment strategies
+* Implement Horizontal Pod Autoscaling (HPA)
+* Implement monitoring and observability
+* Demonstrate progressive delivery techniques
+* Simulate production-grade deployment workflows
+
+---
+
+# Technology Stack
+
+## Application Layer
 
 * FastAPI
-* SQLAlchemy
-* PostgreSQL
-* Pydantic
-* Uvicorn
+* Python 3.12
 
-### Containerization
+## Database Layer
+
+* PostgreSQL
+
+## Containerization
 
 * Docker
-* Docker Hub
 
-### CI/CD
+## Kubernetes Platform
 
-* GitHub Actions
-* Self Hosted Runner
-* Trivy Security Scanner
+* Kubernetes
+* Helm
 
-### Kubernetes
+## GitOps
 
-* K3s
-* Traefik Ingress Controller
-* Metrics Server
-* Horizontal Pod Autoscaler
-* Pod Disruption Budget
-* RBAC
+* ArgoCD
+
+## Progressive Delivery
+
+* Argo Rollouts
+
+## Monitoring
+
+* Prometheus
+* ServiceMonitor
+* PrometheusRule
+
+## Networking
+
+* Traefik Ingress
+
+## Security
+
+* Kubernetes RBAC
+* Service Accounts
+* Secrets
 
 ---
 
-## Features
+# Architecture
 
-### Inventory Management
+Git Repository
+↓
+GitHub Actions (Planned)
+↓
+ArgoCD
+↓
+Helm Charts
+↓
+Kubernetes
+↓
+Application Pods
+↓
+PostgreSQL
 
-* Create Inventory Item
-* List Inventory Items
-* Get Inventory By ID
-* Update Inventory Item
-* Delete Inventory Item
+Monitoring Stack
 
-### Health Monitoring
+Prometheus
+↓
+ServiceMonitor
+↓
+Application Metrics
 
-* Application Health Check
-* Database Connectivity Validation
+---
 
-### Security
+# Project Milestones
 
-* Kubernetes Secrets
-* Dedicated Service Account
-* Role Based Access Control
+---
 
-### Scalability
+## Milestone 1: Application Development
 
-* Horizontal Pod Autoscaler
-* CPU Based Scaling
-* Automatic Scale Up and Scale Down
+### Achievements
 
-### Reliability
+* Created FastAPI inventory application
+* Added REST APIs
+* Connected application to PostgreSQL
+* Implemented health endpoint
 
-* Rolling Updates
-* Rollbacks
+### Deliverables
+
+* FastAPI backend
+* PostgreSQL integration
+* Health checks
+
+---
+
+## Milestone 2: Dockerization
+
+### Achievements
+
+* Created Dockerfile
+* Built container image
+* Published images to Docker Hub
+
+### Deliverables
+
+Docker Image:
+
+arjunmj/farm-stack
+
+---
+
+## Milestone 3: Kubernetes Deployment
+
+### Achievements
+
+* Created Kubernetes manifests
+* Deployed application pods
+* Deployed PostgreSQL
+* Configured services
+
+### Deliverables
+
+* Deployment
+* Service
+* ConfigMap
+* Secret
+
+---
+
+## Milestone 4: Helm Migration
+
+### Achievements
+
+* Converted manifests into Helm Charts
+* Parameterized configurations
+* Added environment-based values
+
+### Deliverables
+
+Helm Chart Structure
+
+farm-stack
+├── farm-app
+└── postgres
+
+---
+
+## Milestone 5: Security Implementation
+
+### Achievements
+
+* Created Service Accounts
+* Implemented RBAC
+* Added Secrets Management
+
+### Deliverables
+
+* Role
+* RoleBinding
+* ServiceAccount
+* Secret
+
+---
+
+## Milestone 6: Health Probes
+
+### Achievements
+
+Implemented:
+
 * Startup Probe
 * Readiness Probe
 * Liveness Probe
 
----
+### Benefits
 
-## Kubernetes Architecture
-
-Client
-↓
-Traefik Ingress
-↓
-Farm Inventory Service
-↓
-Farm Inventory Pods
-↓
-PostgreSQL Service
-↓
-PostgreSQL Database
-
-Namespaces:
-
-* farm
-* database
+* Faster recovery
+* Better pod lifecycle management
+* Improved application availability
 
 ---
 
-## CI/CD Pipeline
+## Milestone 7: Monitoring Integration
 
-Git Push
-↓
-GitHub Actions
-↓
-Build Docker Image
-↓
-Trivy Security Scan
-↓
-Push Docker Image
-↓
-Cleanup Old Docker Tags
-↓
-Deploy to Kubernetes
-↓
-Verify Rollout
+### Achievements
 
----
+Integrated Prometheus monitoring
 
-## Kubernetes Features Implemented
+### Deliverables
 
-- Namespace Isolation
-- ConfigMaps
-- Secrets
-- Deployments
-- Services
-- Ingress (Traefik)
-- Persistent Volumes
-- Health Checks
-- Startup Probes
-- Readiness Probes
-- Liveness Probes
-- Horizontal Pod Autoscaler (HPA)
-- Pod Disruption Budget (PDB)
-- RBAC (ServiceAccount, Role, RoleBinding)
-- Rolling Updates
-- Rollbacks
+* ServiceMonitor
+* PrometheusRule
+* PostgreSQL Alerts
+* Application Alerts
 
-## DevOps Features Implemented
+### Monitoring Coverage
 
-- GitHub Actions CI/CD
-- Self Hosted Runner
-- Docker Build Automation
-- Docker Hub Integration
-- Trivy Security Scanning
-- Automated Kubernetes Deployment
-- Docker Image Retention Policy
+* Application availability
+* Database status
+* Resource consumption
 
 ---
 
-## Current Project Status
+## Milestone 8: Horizontal Pod Autoscaling (HPA)
 
-Version: v1.0.0
+### Achievements
+
+Implemented CPU-based autoscaling.
+
+### Features
+
+* Dynamic scaling
+* Scale up policies
+* Scale down policies
+* Stabilization windows
+
+### Validation
+
+Successfully tested scaling configurations.
+
+---
+
+## Milestone 9: Pod Disruption Budget
+
+### Achievements
+
+Configured Pod Disruption Budget.
+
+### Benefits
+
+* High Availability
+* Safe node maintenance
+* Controlled pod eviction
+
+---
+
+## Milestone 10: Ingress Implementation
+
+### Achievements
+
+Integrated Traefik Ingress.
+
+### Deliverables
+
+* Host-based routing
+* External application access
+
+---
+
+# Deployment Strategy Implementations
+
+---
+
+## Strategy 1: Standard Deployment
+
+### Branch
+
+main
+
+### Features
+
+* Kubernetes Deployment
+* HPA Integration
+* Rolling Updates
+
+### Status
+
+Validated Successfully
+
+---
+
+## Strategy 2: Manual Canary Deployment
+
+### Branch
+
+farmapp-canary
+
+### Architecture
+
+Stable Deployment
++
+Canary Deployment
+
+### Features
+
+* Stable Pods
+* Canary Pods
+* Independent HPA
+* Traffic Distribution
+
+### Validation
+
+Successfully tested:
+
+* Stable Version (34)
+* Canary Version (35)
+
+Traffic distribution verified through API responses.
+
+### Example
+
+Version 34 → Stable
+
+Version 35 → Canary
+
+---
+
+## Strategy 3: Blue-Green Deployment
+
+### Branch
+
+farmapp-bluegreen
+
+### Architecture
+
+Blue Environment
++
+Green Environment
+
+### Features
+
+* Zero Downtime Switching
+* Parallel Environments
+* Safe Rollbacks
+
+### Validation
+
+Successfully synchronized using ArgoCD.
+
+---
+
+## Strategy 4: Argo Rollouts Canary
+
+### Branch
+
+farmapp-rollouts
+
+### Architecture
+
+Argo Rollout
+↓
+ReplicaSet
+↓
+Pods
+
+### Features
+
+* Progressive Delivery
+* Traffic Weight Control
+* Automated Rollout Steps
+* HPA Integration
+
+### Rollout Steps
+
+20%
+↓
+Pause
+
+50%
+↓
+Pause
+
+100%
+↓
+Promotion
+
+### Validation
+
+Successfully tested:
+
+* Replica management
+* Rollout progression
+* HPA integration
+* Automated ReplicaSet management
+
+---
+
+# GitOps Implementation
+
+## ArgoCD Applications
+
+### Branch Isolation
+
+Each deployment strategy is maintained in its own branch.
+
+main
+farmapp-canary
+farmapp-bluegreen
+farmapp-rollouts
+
+### Validation
+
+Successfully verified:
+
+* Independent synchronization
+* No cross-branch interference
+* Automatic reconciliation
+* Drift detection
+
+---
+
+# Key Challenges Solved
+
+## Helm Ownership Conflicts
+
+Resolved Helm ownership metadata issues.
+
+## Immutable Deployment Selectors
+
+Resolved deployment selector conflicts during strategy migration.
+
+## HPA Selector Conflicts
+
+Resolved ambiguous selector issues when multiple deployments existed.
+
+## Rollout Migration
+
+Successfully migrated from Deployment resources to Argo Rollouts.
+
+## Replica Management
+
+Implemented conditional logic:
+
+* HPA Enabled
+* HPA Disabled
+
+with proper replica handling.
+
+---
+
+# Current Status
 
 Completed:
 
-* FastAPI CRUD APIs
-* PostgreSQL Integration
-* Kubernetes Deployment
-* CI/CD Pipeline
-* Ingress Access
-* HPA Validation
-* PDB Configuration
-* RBAC Implementation
+* Docker
+* Kubernetes
+* Helm
+* PostgreSQL
+* RBAC
+* Secrets
+* ConfigMaps
+* Probes
+* HPA
+* PDB
+* Prometheus
+* ServiceMonitor
+* Traefik
+* ArgoCD
+* Manual Canary
+* Blue-Green
+* Argo Rollouts Canary
 
-Upcoming:
+Project State:
 
-* Helm Charts
-* Prometheus Monitoring
-* Grafana Dashboards
-* Loki Logging
-* ArgoCD GitOps
+Production-Ready Demonstration Platform
 
 ---
 
-## Author
+# Future Enhancements
+
+## CI/CD Pipeline
+
+GitHub Actions
+
+* Linting
+* Testing
+* Build
+* Push Images
+* Helm Validation
+
+## Security
+
+* Trivy Scanning
+* Secret Scanning
+* Image Vulnerability Scanning
+
+## Advanced Rollouts
+
+* Analysis Templates
+* Automatic Rollbacks
+* Prometheus-based Decisions
+
+## Multi-Environment Promotion
+
+Development
+↓
+QA
+↓
+Staging
+↓
+Production
+
+---
+
+# Author
 
 Arjun M J
 
 DevOps Engineer | Cloud Architect | Cyber Forensics Analyst
+
+AWS Solution Architect Associate
+AWS Security Specialty
+RCCE Certified
