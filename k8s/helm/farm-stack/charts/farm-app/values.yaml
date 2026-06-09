@@ -1,8 +1,6 @@
-replicaCount: 3
-
 image:
   repository: arjunmj/farm-stack
-  tag: latest
+  tag: 36
   pullPolicy: Always
 
 resources:
@@ -91,7 +89,7 @@ ingress:
 hpa:
   enabled: true
 
-  minReplicas: 9
+  minReplicas: 4
   maxReplicas: 20
 
   cpuUtilization: 70
