@@ -4,7 +4,7 @@ name: Farm Stack CI/CD
 on:
   push:
     branches:
-      - main
+      - farmapp-bluegreen
 
 env:
   IMAGE_NAME: arjunmj/farm-stack
