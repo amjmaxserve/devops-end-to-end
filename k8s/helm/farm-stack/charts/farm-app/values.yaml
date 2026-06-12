@@ -99,7 +99,7 @@ canary:
     imageTag: "35"
 
 hpa:
-  enabled: false
+  enabled: true
 
   stable:
     minReplicas: 3
