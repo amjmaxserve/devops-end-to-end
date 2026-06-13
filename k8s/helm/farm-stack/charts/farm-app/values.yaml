@@ -91,11 +91,11 @@ ingress:
 canary: 
   enabled: true
   stable:
-    replicas: 5
+    replicas: 1
     imageTag: "34"
 
   canary:
-    replicas: 5
+    replicas: 9
     imageTag: "35"
 
 hpa:
