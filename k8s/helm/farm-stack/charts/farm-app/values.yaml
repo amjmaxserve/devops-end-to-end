@@ -91,7 +91,7 @@ ingress:
 canary: 
   enabled: true
   stable:
-    replicas: 1
+    replicas: 0
     imageTag: "34"
 
   canary:
