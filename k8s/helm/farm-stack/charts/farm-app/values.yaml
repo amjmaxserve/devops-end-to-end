@@ -1,6 +1,6 @@
 image:
   repository: arjunmj/farm-stack
-  tag: 36
+  tag: 37
   pullPolicy: Always
 
 resources:
