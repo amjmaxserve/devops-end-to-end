@@ -80,14 +80,7 @@ jobs:
         run: |
           kubectl config current-context
           kubectl get prometheusrule postgres-alerts -n farm-stack -o yaml || true
-      - name: Helm Upgrade
-        run: |
-          helm upgrade --install farm-stack \
-            $HELM_CHART_PATH \
-            -n $NAMESPACE \
-            -f $HELM_CHART_PATH/values-prod.yaml \
-            --set farm-app.image.tag=${{ github.run_number }}
-
+     
       - name: Wait for Rollout
         run: |
           kubectl rollout status \
