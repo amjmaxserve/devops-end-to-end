@@ -543,3 +543,22 @@ Canary deployment strategy demonstrating progressive traffic shifting and contro
 
 ### Application Docs 
 ![Fast Api Docs](screenshots/application-docs-fastapi.png)
+
+---
+
+## About the Author
+
+Arjun MJ
+
+Platform Engineer | Senior DevOps Engineer
+
+Specializing in:
+
+- Kubernetes
+- Terraform
+- AWS
+- GitOps
+- CI/CD
+- Platform Engineering
+
+This project was built to demonstrate production-grade Platform Engineering concepts and cloud-native operations.
