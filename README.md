@@ -17,57 +17,20 @@ The project evolved from a simple FastAPI inventory application into a complete 
 
 The objective is not merely to deploy an application, but to showcase real-world Platform Engineering responsibilities commonly performed in production environments.
 
-```
-## Platform Architecture
-
-GitHub Repository
-        │
-        ▼
-GitHub Actions
-(Build → Scan → Push)
-        │
-        ▼
-Docker Hub
-        │
-        ▼
-ArgoCD
-(GitOps Controller)
-        │
-        ▼
-Helm Charts
-        │
-        ▼
-Kubernetes Cluster
-        │
- ┌──────┼─────────────┐
- ▼      ▼             ▼
-
-FastAPI PostgreSQL Monitoring
- App      DB          Stack
-
-                     ┌──────────────┐
-                     │ Prometheus   │
-                     │ Grafana      │
-                     │ Alerts       │
-                     └──────────────┘
-
-Deployment Strategies
-
-- Rolling Updates
-- Canary
-- Blue-Green
-- Argo Rollouts
-
-```
 ---
 
+## Platform Architecture
+
+![Farm Inventory Platform Architecture](screenshots/architect-diagram.png)
+
+---
 ## Platform Capabilities
 
 ### Application Delivery
 
 ✅ Kubernetes Deployments
 
-✅ Helm Package Management
+✅ Helm Chart Management
 
 ✅ GitOps with ArgoCD
 
@@ -81,7 +44,7 @@ Deployment Strategies
 
 ✅ Kubernetes Secrets
 
-✅ Trivy Security Scanning
+✅ Trivy Vulnerability Scanning
 
 ### Scalability
 
@@ -93,11 +56,11 @@ Deployment Strategies
 
 ✅ Prometheus
 
+✅ Grafana
+
 ✅ ServiceMonitor
 
-✅ PrometheusRule
-
-✅ Application Metrics
+✅ Alert Rules
 
 ### Reliability
 
@@ -111,11 +74,12 @@ Deployment Strategies
 
 ✅ GitHub Actions
 
-✅ Docker Image Build
-
-✅ Vulnerability Scanning
+✅ Automated Build
 
 ✅ Automated Deployments
+
+✅ Security Scanning
+
 
 ---
 ## Technology Stack
